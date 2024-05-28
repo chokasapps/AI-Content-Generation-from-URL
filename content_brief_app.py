@@ -106,7 +106,7 @@ if openai_api_key:
     st.sidebar.write("Using OpenAI API key from environment variable.")
 else:
     st.sidebar.write("Please provide your OpenAI API key:")
-    openai_api_key = st.sidebar.text_input("Enter OpenAI API Key:")
+    openai_api_key = st.sidebar.text_input("Enter OpenAI API Key:", type='password')
     if openai_api_key:
         st.write(
             "API key provided. Make sure to set it in your environment variable for future use."
