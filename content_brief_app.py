@@ -95,7 +95,9 @@ def generate_content(prompt, openai_api_key):
 
 
 # Streamlit app
-st.title("AI Content Generation from URL")
+TITLE = "AI Content Generation from URL"
+st.set_page_config(page_title=TITLE)
+st.title(TITLE)
 url = st.text_input("Enter the URL of the web page:")
 
 # Check if OPENAI_API_KEY is set in the environment variable
