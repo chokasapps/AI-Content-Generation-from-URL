@@ -73,14 +73,37 @@ def generate_content(prompt, openai_api_key):
         return None
 
 
-# Function to generate an image using DALL-E
-def generate_image_from_headline(headline, openai_api_key):
+# Function to generate a summary and DALL-E prompt using OpenAI
+def generate_summary_and_prompt(generated_content, openai_api_key):
     client = OpenAI(api_key=openai_api_key)
     try:
-        prompt = f"Generate a relevant and appealing visual according to the headlines mentioned here: {headline}"
+        summary_prompt = [
+            {"role": "system", "content": "You are a summarization assistant."},
+            {
+                "role": "user",
+                "content": f"Summarize the following content and create a prompt for generating a relevant image: {generated_content}",
+            },
+        ]
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=summary_prompt,
+            temperature=0.7,
+            max_tokens=300,
+        )
+        summary_and_prompt = response.choices[0].message.content
+        return summary_and_prompt
+    except Exception as e:
+        st.error(f"Error generating summary and DALL-E prompt: {e}")
+        return None
+
+
+# Function to generate an image using DALL-E
+def generate_image(dalle_prompt, openai_api_key):
+    client = OpenAI(api_key=openai_api_key)
+    try:
         response = client.images.generate(
             model="dall-e-2",
-            prompt=prompt,
+            prompt=dalle_prompt,
             size="512x512",  # Set image size to 512x512
             quality="standard",
             n=1,
@@ -141,11 +164,14 @@ if url_input:
                 generated_content = generate_content(prompts, openai_api_key)
 
                 if generated_content:
-                    # Generate an image from the first headline if available
-                    if content_brief["headlines"]:
-                        first_headline = content_brief["headlines"][0]
-                        generated_image_url = generate_image_from_headline(
-                            first_headline, openai_api_key
+                    # Generate a summary and DALL-E prompt
+                    summary_and_prompt = generate_summary_and_prompt(
+                        generated_content, openai_api_key
+                    )
+                    if summary_and_prompt:
+                        # Generate an image using the summary and DALL-E prompt
+                        generated_image_url = generate_image(
+                            summary_and_prompt, openai_api_key
                         )
                         if generated_image_url:
                             st.subheader("Generated Image")
