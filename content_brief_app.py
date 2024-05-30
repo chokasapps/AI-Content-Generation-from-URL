@@ -103,7 +103,7 @@ def generate_image(dalle_prompt, openai_api_key):
     try:
         response = client.images.generate(
             model="dall-e-2",
-            prompt=dalle_prompt,
+            prompt=dalle_prompt + " The generated image must not contain any text.",
             size="512x512",  # Set image size to 512x512
             quality="standard",
             n=1,
